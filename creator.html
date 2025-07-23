@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP Creator - Build Your Management Pack</title>
+    <meta name="description" content="Create custom SCOM Management Packs with our interactive wizard. Build discoveries, monitors, rules, and more.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="mp-creator.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav__brand">
+                <i class="fas fa-cube"></i>
+                <span>SCOM MP Creator</span>
+            </div>
+            <ul class="nav__menu">
+                <li><a href="index.html" class="nav__link">Home</a></li>
+                <li><a href="#creator" class="nav__link active">MP Creator</a></li>
+                <li><a href="#help" class="nav__link">Help</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- MP Creator Section -->
+    <section id="creator" class="creator section">
+        <div class="container">
+            <div class="section__header">
+                <h1 class="section__title">Management Pack Creator</h1>
+                <p class="section__subtitle">Build your custom SCOM Management Pack with our interactive wizard</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Basic Info</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Discovery</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Monitors</div>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Rules</div>
+                </div>
+                <div class="progress-step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Other</div>
+                </div>
+                <div class="progress-step" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-label">Generate</div>
+                </div>
+            </div>
+
+            <!-- Creator Form -->
+            <div class="creator-form">
+                <!-- Step 1: Basic Information -->
+                <div class="form-step active" id="step-1">
+                    <h2>Basic Management Pack Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="company-id">Company ID *</label>
+                            <input type="text" id="company-id" placeholder="e.g., Contoso" required>
+                            <small>Short company abbreviation (no spaces or special characters)</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="app-name">Application Name *</label>
+                            <input type="text" id="app-name" placeholder="e.g., WebApp" required>
+                            <small>Short application name (no spaces or special characters)</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="mp-version">Version</label>
+                            <input type="text" id="mp-version" placeholder="1.0.0.0" value="1.0.0.0">
+                        </div>
+                        <div class="form-group">
+                            <label for="mp-description">Description</label>
+                            <textarea id="mp-description" placeholder="Describe what this Management Pack monitors"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--primary" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Discovery Selection -->
+                <div class="form-step" id="step-2">
+                    <h2>Choose Discovery Method</h2>
+                    <p class="step-description">Select how your Management Pack will discover and identify the objects to monitor. Choose the method that best fits your application.</p>
+                    
+                    <div class="discovery-options">
+                        <div class="discovery-card" data-discovery="registry-key">
+                            <div class="discovery-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <h3>Registry Key Discovery</h3>
+                            <p>Discover applications by checking if a specific registry key exists</p>
+                            <div class="discovery-details">
+                                <strong>Best for:</strong> Most Windows applications that create registry entries during installation
+                            </div>
+                        </div>
+
+                        <div class="discovery-card" data-discovery="registry-value">
+                            <div class="discovery-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3>Registry Value Discovery</h3>
+                            <p>Discover by checking the content of a specific registry value</p>
+                            <div class="discovery-details">
+                                <strong>Best for:</strong> Applications where you need to check version numbers or specific configuration values
+                            </div>
+                        </div>
+
+                        <div class="discovery-card" data-discovery="wmi-query">
+                            <div class="discovery-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3>WMI Query Discovery</h3>
+                            <p>Use Windows Management Instrumentation queries to discover objects</p>
+                            <div class="discovery-details">
+                                <strong>Best for:</strong> Discovering based on processes, services, or system information
+                            </div>
+                        </div>
+
+                        <div class="discovery-card" data-discovery="script-discovery">
+                            <div class="discovery-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h3>Script Discovery</h3>
+                            <p>Custom PowerShell or VBScript logic to discover your application</p>
+                            <div class="discovery-details">
+                                <strong>Best for:</strong> Complex discovery logic or custom applications
+                            </div>
+                        </div>
+
+                        <div class="discovery-card" data-discovery="service-discovery">
+                            <div class="discovery-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <h3>Service Discovery</h3>
+                            <p>Discover based on Windows service presence</p>
+                            <div class="discovery-details">
+                                <strong>Best for:</strong> Applications that run as Windows services
+                            </div>
+                        </div>
+
+                        <div class="discovery-card" data-discovery="skip">
+                            <div class="discovery-icon">
+                                <i class="fas fa-forward"></i>
+                            </div>
+                            <h3>Skip Discovery</h3>
+                            <p>Create monitors and rules without a custom discovery (target existing classes)</p>
+                            <div class="discovery-details">
+                                <strong>Best for:</strong> Monitoring existing objects like computers or services
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--secondary" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn btn--primary" onclick="nextStep()" disabled id="next-discovery">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Monitors Selection -->
+                <div class="form-step" id="step-3">
+                    <h2>Select Monitors</h2>
+                    <p class="step-description">Choose the health monitors you want to create. Monitors track the state of your discovered objects and generate alerts when issues occur.</p>
+                    
+                    <div class="components-grid">
+                        <div class="component-card" data-component="service-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h3>Service Monitor</h3>
+                            <p>Monitor Windows service state (Running/Stopped)</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="service-monitor">
+                                <span class="checkmark"></span>
+                                Add Service Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="performance-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <h3>Performance Monitor</h3>
+                            <p>Monitor performance counters and generate alerts based on thresholds</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="performance-monitor">
+                                <span class="checkmark"></span>
+                                Add Performance Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="event-log-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <h3>Event Log Monitor</h3>
+                            <p>Monitor for specific events in Windows Event Logs</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="event-log-monitor">
+                                <span class="checkmark"></span>
+                                Add Event Log Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="script-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h3>Script Monitor</h3>
+                            <p>Custom PowerShell script to check application health</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="script-monitor">
+                                <span class="checkmark"></span>
+                                Add Script Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="port-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <h3>Port Check Monitor</h3>
+                            <p>Monitor TCP port availability</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="port-monitor">
+                                <span class="checkmark"></span>
+                                Add Port Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="registry-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <h3>Registry Monitor</h3>
+                            <p>Monitor registry key or value changes</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="registry-monitor">
+                                <span class="checkmark"></span>
+                                Add Registry Monitor
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--secondary" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn btn--primary" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Rules Selection -->
+                <div class="form-step" id="step-4">
+                    <h2>Select Rules</h2>
+                    <p class="step-description">Choose data collection and alerting rules. Rules collect performance data or generate alerts based on events and conditions.</p>
+                    
+                    <div class="components-grid">
+                        <div class="component-card" data-component="performance-collection">
+                            <div class="component-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>Performance Collection</h3>
+                            <p>Collect performance counter data for reporting and analysis</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="performance-collection">
+                                <span class="checkmark"></span>
+                                Add Performance Collection
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="event-alert">
+                            <div class="component-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3>Event Log Alert</h3>
+                            <p>Generate alerts when specific events occur in Windows Event Logs</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="event-alert">
+                                <span class="checkmark"></span>
+                                Add Event Alert Rule
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="script-alert">
+                            <div class="component-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <h3>Script Alert</h3>
+                            <p>Custom PowerShell script that generates alerts based on conditions</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="script-alert">
+                                <span class="checkmark"></span>
+                                Add Script Alert Rule
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="snmp-alert">
+                            <div class="component-icon">
+                                <i class="fas fa-satellite"></i>
+                            </div>
+                            <h3>SNMP Alert</h3>
+                            <p>Generate alerts based on SNMP trap reception</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="snmp-alert">
+                                <span class="checkmark"></span>
+                                Add SNMP Alert Rule
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--secondary" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn btn--primary" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Other Components -->
+                <div class="form-step" id="step-5">
+                    <h2>Additional Components</h2>
+                    <p class="step-description">Add groups, tasks, and views to complete your Management Pack functionality.</p>
+                    
+                    <div class="other-components">
+                        <div class="component-section">
+                            <h3><i class="fas fa-layer-group"></i> Groups</h3>
+                            <div class="components-grid">
+                                <div class="component-card" data-component="computer-group">
+                                    <div class="component-icon">
+                                        <i class="fas fa-desktop"></i>
+                                    </div>
+                                    <h3>Computer Group</h3>
+                                    <p>Organize computers for monitoring</p>
+                                    <label class="component-checkbox">
+                                        <input type="checkbox" value="computer-group">
+                                        <span class="checkmark"></span>
+                                        Add Computer Group
+                                    </label>
+                                </div>
+
+                                <div class="component-card" data-component="instance-group">
+                                    <div class="component-icon">
+                                        <i class="fas fa-object-group"></i>
+                                    </div>
+                                    <h3>Instance Group</h3>
+                                    <p>Group discovered application instances</p>
+                                    <label class="component-checkbox">
+                                        <input type="checkbox" value="instance-group">
+                                        <span class="checkmark"></span>
+                                        Add Instance Group
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="component-section">
+                            <h3><i class="fas fa-tasks"></i> Tasks</h3>
+                            <div class="components-grid">
+                                <div class="component-card" data-component="powershell-task">
+                                    <div class="component-icon">
+                                        <i class="fas fa-terminal"></i>
+                                    </div>
+                                    <h3>PowerShell Task</h3>
+                                    <p>Custom PowerShell actions for operators</p>
+                                    <label class="component-checkbox">
+                                        <input type="checkbox" value="powershell-task">
+                                        <span class="checkmark"></span>
+                                        Add PowerShell Task
+                                    </label>
+                                </div>
+
+                                <div class="component-card" data-component="recovery-task">
+                                    <div class="component-icon">
+                                        <i class="fas fa-redo"></i>
+                                    </div>
+                                    <h3>Recovery Action</h3>
+                                    <p>Automatic recovery actions for monitors</p>
+                                    <label class="component-checkbox">
+                                        <input type="checkbox" value="recovery-task">
+                                        <span class="checkmark"></span>
+                                        Add Recovery Action
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="component-section">
+                            <h3><i class="fas fa-chart-bar"></i> Views</h3>
+                            <div class="components-grid">
+                                <div class="component-card" data-component="state-view">
+                                    <div class="component-icon">
+                                        <i class="fas fa-heartbeat"></i>
+                                    </div>
+                                    <h3>State View</h3>
+                                    <p>Show health state of monitored objects</p>
+                                    <label class="component-checkbox">
+                                        <input type="checkbox" value="state-view">
+                                        <span class="checkmark"></span>
+                                        Add State View
+                                    </label>
+                                </div>
+
+                                <div class="component-card" data-component="alert-view">
+                                    <div class="component-icon">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </div>
+                                    <h3>Alert View</h3>
+                                    <p>Show active alerts for your application</p>
+                                    <label class="component-checkbox">
+                                        <input type="checkbox" value="alert-view">
+                                        <span class="checkmark"></span>
+                                        Add Alert View
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--secondary" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn btn--primary" onclick="nextStep()">Configure & Generate</button>
+                    </div>
+                </div>
+
+                <!-- Step 6: Generate -->
+                <div class="form-step" id="step-6">
+                    <h2>Generate Management Pack</h2>
+                    <div class="generate-options">
+                        <div class="option-card">
+                            <h3>Preview MP Structure</h3>
+                            <p>Review the structure of your Management Pack before generating</p>
+                            <button type="button" class="btn btn--secondary" onclick="previewMP()">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                        </div>
+                        <div class="option-card">
+                            <h3>Generate XML</h3>
+                            <p>Generate the complete Management Pack XML file</p>
+                            <button type="button" class="btn btn--primary" onclick="generateMP()">
+                                <i class="fas fa-download"></i> Generate
+                            </button>
+                        </div>
+                        <div class="option-card">
+                            <h3>Download Package</h3>
+                            <p>Download a complete MP package with deployment scripts</p>
+                            <button type="button" class="btn btn--primary" onclick="downloadPackage()">
+                                <i class="fas fa-file-archive"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview/Output Area -->
+                    <div class="output-area" id="output-area" style="display: none;">
+                        <div class="output-header">
+                            <h3>Generated Management Pack</h3>
+                            <button type="button" class="btn btn--small" onclick="copyToClipboard()">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <pre id="mp-output"><code></code></pre>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--secondary" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn btn--success" onclick="startOver()">Start Over</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Help Section -->
+    <section id="help" class="help section section--light">
+        <div class="container">
+            <div class="section__header">
+                <h2 class="section__title">How to Use the MP Creator</h2>
+            </div>
+            
+            <div class="help-grid">
+                <div class="help-card">
+                    <div class="help-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3>Basic Information</h3>
+                    <p>Start by providing your company ID and application name. These will be used as prefixes throughout the Management Pack to ensure uniqueness.</p>
+                </div>
+                
+                <div class="help-card">
+                    <div class="help-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Select Components</h3>
+                    <p>Choose which components you need in your MP. Each component serves a specific purpose in monitoring your application or service.</p>
+                </div>
+                
+                <div class="help-card">
+                    <div class="help-icon">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <h3>Configure Details</h3>
+                    <p>Provide specific configuration for each selected component, such as registry keys, service names, or performance counters.</p>
+                </div>
+                
+                <div class="help-card">
+                    <div class="help-icon">
+                        <i class="fas fa-file-code"></i>
+                    </div>
+                    <h3>Generate XML</h3>
+                    <p>Review and generate the complete Management Pack XML that can be imported into SCOM.</p>
+                </div>
+            </div>
+
+            <div class="help-reference">
+                <h3>Component Reference</h3>
+                <div class="reference-grid">
+                    <div class="reference-item">
+                        <strong>Discoveries:</strong> Used to find and identify objects to monitor (applications, services, components)
+                    </div>
+                    <div class="reference-item">
+                        <strong>Monitors:</strong> Track the health state of discovered objects and generate alerts when issues occur
+                    </div>
+                    <div class="reference-item">
+                        <strong>Rules:</strong> Collect performance data or generate alerts based on events or conditions
+                    </div>
+                    <div class="reference-item">
+                        <strong>Groups:</strong> Organize computers or instances for easier management and targeting
+                    </div>
+                    <div class="reference-item">
+                        <strong>Tasks:</strong> Provide custom actions that operators can execute from the SCOM console
+                    </div>
+                    <div class="reference-item">
+                        <strong>Views:</strong> Create custom displays in the SCOM console for your monitored objects
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script src="mp-creator.js"></script>
+</body>
+</html>
