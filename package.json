@@ -1,22 +1,14 @@
 {
-  "name": "scom-mp-creator-website",
-  "version": "1.0.0",
-  "description": "Professional SCOM Management Pack development services website",
-  "main": "index.html",
+  "name": "scom-mp-creator",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "python3 -m http.server 3000",
-    "dev": "python3 -m http.server 8080",
-    "build": "echo 'Static site - no build step required'",
-    "serve": "python3 -m http.server 3000"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "scom",
-    "management-pack",
-    "system-center",
-    "operations-manager",
-    "monitoring",
-    "microsoft"
-  ],
-  "author": "SCOM MP Creator",
-  "license": "MIT"
+  "devDependencies": {
+    "vite": "^5.0.8"
+  }
 }

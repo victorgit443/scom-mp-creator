@@ -166,6 +166,9 @@ body {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     position: relative;
     overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
 }
 
 .hero::before {
@@ -180,12 +183,15 @@ body {
 }
 
 .hero .container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 60px;
     position: relative;
     z-index: 1;
+    text-align: center;
+    width: 100%;
+}
+
+.hero__content {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .hero__title {
@@ -209,39 +215,18 @@ body {
 .hero__buttons {
     display: flex;
     gap: 20px;
-}
-
-.hero__image {
-    display: flex;
     justify-content: center;
-    align-items: center;
-}
-
-.hero__graphic {
-    width: 300px;
-    height: 300px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 6rem;
-    color: white;
-    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
-    animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
 }
 
 /* About Section */
 .about__grid {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 80px;
-    align-items: start;
+    display: flex;
+    justify-content: center;
+}
+
+.about__content {
+    max-width: 800px;
+    text-align: center;
 }
 
 .about__content h3 {
@@ -267,12 +252,16 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     margin-top: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .feature {
     display: flex;
     align-items: flex-start;
     gap: 15px;
+    text-align: left;
 }
 
 .feature i {
