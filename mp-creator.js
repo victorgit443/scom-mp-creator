@@ -204,8 +204,191 @@ class MPCreator {
             },
             'process-monitor': {
                 name: 'Process Monitor',
-                template: 'Monitor.Process.mpx',
+                template: `<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <MonitorTypes>
+        <UnitMonitorType ID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.MonitorType" Accessibility="Public">
+          <MonitorTypeStates>
+            <MonitorTypeState ID="ProcessCountThresholdBreached" NoDetection="false" />
+            <MonitorTypeState ID="ProcessCountWithinThresholds" NoDetection="false" />
+          </MonitorTypeStates>
+          <Configuration>
+            <IncludeSchemaTypes>
+              <SchemaType>System!System.ExpressionEvaluatorSchema</SchemaType>
+            </IncludeSchemaTypes>
+            <xsd:element name="ProcessName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+            <xsd:element name="FrequencySeconds" type="xsd:unsignedInt" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+            <xsd:element name="MinProcessCount" type="xsd:unsignedInt" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+            <xsd:element name="MaxProcessCount" type="xsd:unsignedInt" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />			
+            <xsd:element name="MatchCount" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          </Configuration>
+          <OverrideableParameters>
+            <OverrideableParameter ID="FrequencySeconds" Selector="$Config/FrequencySeconds$" ParameterType="int" />
+            <OverrideableParameter ID="MinProcessCount" Selector="$Config/MinProcessCount$" ParameterType="int" />
+            <OverrideableParameter ID="MaxProcessCount" Selector="$Config/MaxProcessCount$" ParameterType="int" />
+            <OverrideableParameter ID="MatchCount" Selector="$Config/MatchCount$" ParameterType="int" />
+          </OverrideableParameters>
+          <MonitorImplementation>
+            <MemberModules>
+              <DataSource ID="DS" TypeID="System!System.ProcessInformationProvider">
+                <Frequency>$Config/FrequencySeconds$</Frequency>
+              </DataSource>
+              <ConditionDetection ID="CDProcessCountWithinThresholds" TypeID="System!System.ExpressionFilter">
+                  <Expression>
+                    <And>
+                      <Expression>
+                        <Exists>
+                          <ValueExpression>
+                            <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                          </ValueExpression>
+                        </Exists>
+                      </Expression>
+                      <Expression>						
+                        <SimpleExpression>
+                          <ValueExpression>
+                            <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                          </ValueExpression>
+                          <Operator>GreaterEqual</Operator>
+                          <ValueExpression>
+                            <Value Type="UnsignedInteger">$Config/MinProcessCount$</Value>
+                          </ValueExpression>
+                        </SimpleExpression>
+                      </Expression>	
+                      <Expression>							  
+                        <SimpleExpression>
+                          <ValueExpression>
+                            <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                          </ValueExpression>
+                          <Operator>LessEqual</Operator>
+                          <ValueExpression>
+                            <Value Type="UnsignedInteger">$Config/MaxProcessCount$</Value>
+                          </ValueExpression>
+                        </SimpleExpression>
+                      </Expression>							
+                    </And>
+                  </Expression>
+              </ConditionDetection>
+              <ConditionDetection ID="CDProcessCountThresholdBreached" TypeID="System!System.ExpressionFilter">
+                  <Expression>
+                    <Not>
+                      <Expression>
+                        <And>
+                          <Expression>
+                            <Exists>
+                              <ValueExpression>
+                                <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                              </ValueExpression>
+                            </Exists>
+                          </Expression>
+                          <Expression>						
+                            <SimpleExpression>
+                              <ValueExpression>
+                                <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                              </ValueExpression>
+                              <Operator>GreaterEqual</Operator>
+                              <ValueExpression>
+                                <Value Type="UnsignedInteger">$Config/MinProcessCount$</Value>
+                              </ValueExpression>
+                            </SimpleExpression>
+                          </Expression>	
+                          <Expression>							  
+                            <SimpleExpression>
+                              <ValueExpression>
+                                <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                              </ValueExpression>
+                              <Operator>LessEqual</Operator>
+                              <ValueExpression>
+                                <Value Type="UnsignedInteger">$Config/MaxProcessCount$</Value>
+                              </ValueExpression>
+                            </SimpleExpression>
+                          </Expression>							
+                        </And>
+                      </Expression>
+                    </Not>
+                  </Expression>
+                  <SuppressionSettings>
+                    <MatchCount>$Config/MatchCount$</MatchCount>
+                  </SuppressionSettings>			  
+              </ConditionDetection>
+            </MemberModules>
+            <RegularDetections>
+              <RegularDetection MonitorTypeStateID="ProcessCountThresholdBreached">
+                <Node ID="CDProcessCountThresholdBreached">
+                  <Node ID="DS" />
+                </Node>
+              </RegularDetection>
+              <RegularDetection MonitorTypeStateID="ProcessCountWithinThresholds">
+                <Node ID="CDProcessCountWithinThresholds">
+                  <Node ID="DS" />
+                </Node>
+              </RegularDetection>
+            </RegularDetections>
+          </MonitorImplementation>
+        </UnitMonitorType>		
+    </MonitorTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Monitors>
+      <UnitMonitor ID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.Monitor" Accessibility="Public" Enabled="true" Target="##ClassID##" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="false" Priority="Normal" TypeID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.MonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.Monitor.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Warning</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data[Default='0']/Context/ProcessInformations/ProcessInformation[./ProcessName ='##ProcessName##']/ActiveInstanceCount$</AlertParameter1>			
+            <AlertParameter2>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="ProcessCountWithinThresholds" MonitorTypeStateID="ProcessCountWithinThresholds" HealthState="Success" />
+          <OperationalState ID="ProcessCountThresholdBreached" MonitorTypeStateID="ProcessCountThresholdBreached" HealthState="Warning" />
+        </OperationalStates>
+        <Configuration>
+          <ProcessName>##ProcessName##</ProcessName>    
+          <FrequencySeconds>##FrequencySeconds##</FrequencySeconds>
+          <MinProcessCount>##MinProcessCount##</MinProcessCount>
+          <MaxProcessCount>##MaxProcessCount##</MaxProcessCount>		  
+          <MatchCount>##MatchCount##</MatchCount>
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
+  </Monitoring>
+  <Presentation>  
+    <StringResources>
+      <StringResource ID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.Monitor.AlertMessage" />
+    </StringResources>
+  </Presentation>  
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>  
+        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.Monitor">
+          <Name>##CompanyID## ##AppName## ##ProcessName## Process Count Monitor</Name>
+        </DisplayString>
+        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.Monitor" SubElementID="ProcessCountWithinThresholds">
+          <Name>Process count within thresholds</Name>
+        </DisplayString>
+        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.Monitor" SubElementID="ProcessCountThresholdBreached">
+          <Name>Process count threshold breached</Name>
+        </DisplayString>
+        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.ProcessCount.Monitor.AlertMessage">
+          <Name>##AppName## ##ProcessName## - Process count threshold has been breached.</Name>
+          <Description>The number of expected processes was less than or greater than the thresholds
+Process name: (##ProcessName##)
+Process count found: {0} 
+Computer: {1}</Description>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>`,
                 fields: [
+                    { id: 'uniqueId', label: 'Unique ID (no spaces)', type: 'text', required: true, placeholder: 'WebServer' },
+                    { id: 'targetClass', label: 'Target Class', type: 'select', required: true, value: 'Windows!Microsoft.Windows.Server.OperatingSystem', options: [
+                        { value: 'Windows!Microsoft.Windows.Server.OperatingSystem', text: 'Windows Server OS' },
+                        { value: 'Windows!Microsoft.Windows.Computer', text: 'Windows Computer' }
+                    ]},
                     { id: 'processName', label: 'Process Name (lowercase)', type: 'text', required: true, placeholder: 'notepad.exe' },
                     { id: 'frequencySeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '60' },
                     { id: 'minProcessCount', label: 'Minimum Process Count', type: 'number', required: true, value: '1' },
