@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ManagementPack ContentReadable="true" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <Manifest>
+    <Identity>
+      <ID>ORENA.orens</ID>
+      <Version>1.0.0.0</Version>
+    </Identity>
+    <Name>ORENA.orens</Name>
+    
+    <References>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Health">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8437.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="ORENA.orens.Application.Class" Base="Windows!Microsoft.Windows.LocalApplication" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false"/>
+      </ClassTypes>
+    </EntityTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="ORENA.orens.Application.Class.Discovery" Target="Windows!Microsoft.Windows.Server.OperatingSystem" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="ORENA.orens.Application.Class"/>
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.FilteredRegistryDiscoveryProvider">
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</ComputerName>
+          <RegistryAttributeDefinitions>
+            <RegistryAttributeDefinition>
+              <AttributeName>ApplicationRegKeyExists</AttributeName>
+              <Path>SOFTWARE\MyCompany\MyApplication</Path>
+              <PathType>0</PathType>
+              <AttributeType>0</AttributeType>
+            </RegistryAttributeDefinition>
+          </RegistryAttributeDefinitions>
+          <Frequency>86400</Frequency>
+          <ClassId>$MPElement[Name="ORENA.orens.Application.Class"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Name>
+                <Value>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name="System!System.Entity"]/DisplayName$</Name>
+                <Value>ORENA orens</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+          <Expression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="Boolean">Values/ApplicationRegKeyExists</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="Boolean">true</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </Expression>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+    <Monitors>
+      <UnitMonitor ID="ORENA.orens.Application.AvailabilityMonitor" Accessibility="Public" Enabled="true" Target="ORENA.orens.Application.Class" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.CheckNTServiceStateMonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="ORENA.orens.Application.AvailabilityMonitor.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Error</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='Name']$</AlertParameter1>
+            <AlertParameter2>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="Running" MonitorTypeStateID="Running" HealthState="Success"/>
+          <OperationalState ID="NotRunning" MonitorTypeStateID="NotRunning" HealthState="Warning"/>
+        </OperationalStates>
+        <Configuration>
+          <ComputerName/>
+          <ServiceName>W3SVC</ServiceName>
+          <CheckStartupType/>
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
+  </Monitoring>
+  <Presentation>
+    <StringResources>
+      <StringResource ID="ORENA.orens.Application.AvailabilityMonitor.AlertMessage" />
+    </StringResources>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="ORENA.orens.Application.Class">
+          <Name>ORENA orens Application Class</Name>
+        </DisplayString>
+        <DisplayString ElementID="ORENA.orens.Application.Class.Discovery">
+          <Name>ORENA orens Application Class Discovery</Name>
+        </DisplayString>
+        <DisplayString ElementID="ORENA.orens.Application.AvailabilityMonitor">
+          <Name>ORENA orens Application Availability Monitor</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>

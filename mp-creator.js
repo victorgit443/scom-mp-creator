@@ -60,7 +60,7 @@ class MPCreator {
               </Setting>
               <Setting>
                 <Name>$MPElement[Name="System!System.Entity"]/DisplayName$</Name>
-                <Value>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
+                <Value>##CompanyID## ##AppName##</Value>
               </Setting>
             </Settings>
           </InstanceSettings>
@@ -78,6 +78,30 @@ class MPCreator {
         </DataSource>
       </Discovery>
     </Discoveries>
+    <Monitors>
+      <UnitMonitor ID="##CompanyID##.##AppName##.##UniqueID##.AvailabilityMonitor" Accessibility="Public" Enabled="true" Target="##CompanyID##.##AppName##.##UniqueID##.Class" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.CheckNTServiceStateMonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="##CompanyID##.##AppName##.##UniqueID##.AvailabilityMonitor.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Error</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='Name']$</AlertParameter1>
+            <AlertParameter2>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="Running" MonitorTypeStateID="Running" HealthState="Success" />
+          <OperationalState ID="NotRunning" MonitorTypeStateID="NotRunning" HealthState="Warning" />
+        </OperationalStates>
+        <Configuration>
+          <ComputerName />
+          <ServiceName>W3SVC</ServiceName>
+          <CheckStartupType />
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
   </Monitoring>
   <LanguagePacks>
     <LanguagePack ID="ENU" IsDefault="true">
@@ -87,6 +111,9 @@ class MPCreator {
         </DisplayString>
         <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.Class.Discovery">
           <Name>##CompanyID## ##AppName## ##UniqueID## Class Discovery</Name>
+        </DisplayString>
+        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.AvailabilityMonitor">
+          <Name>##CompanyID## ##AppName## ##UniqueID## Availability Monitor</Name>
         </DisplayString>
       </DisplayStrings>
       <KnowledgeArticles></KnowledgeArticles>
@@ -144,52 +171,189 @@ class MPCreator {
                     { id: 'alertSeverity', label: 'Alert Severity', type: 'select', options: ['Information', 'Warning', 'Error'], value: 'Error' }
                 ]
             },
+            'service-monitor-no-alert': {
+                name: 'Service Monitor (No Alert)',
+                template: 'Monitor.Service.NoAlert.mpx',
+                fields: [
+                    { id: 'serviceName', label: 'Service Name', type: 'text', required: true, placeholder: 'W3SVC' }
+                ]
+            },
             'performance-monitor': {
                 name: 'Performance Monitor',
-                template: 'Monitor.Performance.mpx',
+                template: 'Monitor.Performance.ConsecSamples.TwoState.mpx',
                 fields: [
-                    { id: 'counterObject', label: 'Performance Object', type: 'text', required: true, placeholder: 'Processor' },
+                    { id: 'objectName', label: 'Performance Object', type: 'text', required: true, placeholder: 'Processor' },
                     { id: 'counterName', label: 'Counter Name', type: 'text', required: true, placeholder: '% Processor Time' },
-                    { id: 'instance', label: 'Instance', type: 'text', required: false, placeholder: '_Total' },
-                    { id: 'warningThreshold', label: 'Warning Threshold', type: 'number', required: true, placeholder: '80' },
-                    { id: 'criticalThreshold', label: 'Critical Threshold', type: 'number', required: true, placeholder: '95' }
+                    { id: 'instanceName', label: 'Instance', type: 'text', required: false, placeholder: '_Total' },
+                    { id: 'frequencySeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'threshold', label: 'Threshold', type: 'number', required: true, placeholder: '80' },
+                    { id: 'samples', label: 'Consecutive Samples', type: 'number', required: true, value: '3' }
                 ]
             },
-            'event-log-monitor': {
-                name: 'Event Log Monitor',
-                template: 'Monitor.EventLog.mpx',
+            'performance-monitor-multi-instance': {
+                name: 'Performance Monitor (Multi-Instance)',
+                template: 'Monitor.Performance.MultiInstance.ConsecSamples.TwoState.mpx',
                 fields: [
-                    { id: 'logName', label: 'Log Name', type: 'select', options: ['Application', 'System', 'Security'], value: 'Application' },
-                    { id: 'eventSource', label: 'Event Source', type: 'text', required: false, placeholder: 'Leave empty for any source' },
-                    { id: 'eventId', label: 'Event ID', type: 'text', required: false, placeholder: 'e.g., 1000 or 1000,1001,1002' },
-                    { id: 'eventLevel', label: 'Event Level', type: 'select', options: ['Error', 'Warning', 'Information', 'Any'], value: 'Error' }
+                    { id: 'objectName', label: 'Performance Object', type: 'text', required: true, placeholder: 'Process' },
+                    { id: 'counterName', label: 'Counter Name', type: 'text', required: true, placeholder: 'Working Set' },
+                    { id: 'instanceName', label: 'Instance Filter', type: 'text', required: false, placeholder: '*' },
+                    { id: 'frequencySeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'threshold', label: 'Threshold', type: 'number', required: true, placeholder: '100000000' },
+                    { id: 'samples', label: 'Consecutive Samples', type: 'number', required: true, value: '3' }
                 ]
             },
-            'script-monitor': {
-                name: 'Script Monitor',
-                template: 'Monitor.Script.mpx',
+            'process-monitor': {
+                name: 'Process Monitor',
+                template: 'Monitor.Process.mpx',
                 fields: [
-                    { id: 'scriptType', label: 'Script Type', type: 'select', options: ['PowerShell', 'VBScript'], value: 'PowerShell' },
-                    { id: 'scriptBody', label: 'Script Content', type: 'textarea', required: true, placeholder: 'Enter your monitoring script here...' },
-                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' }
+                    { id: 'processName', label: 'Process Name (lowercase)', type: 'text', required: true, placeholder: 'notepad.exe' },
+                    { id: 'frequencySeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '60' },
+                    { id: 'minProcessCount', label: 'Minimum Process Count', type: 'number', required: true, value: '1' },
+                    { id: 'maxProcessCount', label: 'Maximum Process Count', type: 'number', required: true, value: '10' },
+                    { id: 'matchCount', label: 'Match Count (breaches before alert)', type: 'number', required: true, value: '2' }
+                ]
+            },
+            'process-performance-monitor': {
+                name: 'Process Performance Monitor',
+                template: 'Monitor.Process.Performance.ConsecSamples.TwoState.mpx',
+                fields: [
+                    { id: 'processName', label: 'Process Name', type: 'text', required: true, placeholder: 'w3wp' },
+                    { id: 'counterName', label: 'Counter Name', type: 'text', required: true, placeholder: 'Working Set' },
+                    { id: 'frequencySeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'threshold', label: 'Threshold', type: 'number', required: true, placeholder: '100000000' },
+                    { id: 'samples', label: 'Consecutive Samples', type: 'number', required: true, value: '3' }
                 ]
             },
             'port-monitor': {
                 name: 'Port Check Monitor',
-                template: 'Monitor.Port.mpx',
+                template: 'Monitor.PortCheck.mpx',
                 fields: [
-                    { id: 'portNumber', label: 'Port Number', type: 'number', required: true, placeholder: '80' },
-                    { id: 'protocol', label: 'Protocol', type: 'select', options: ['TCP', 'UDP'], value: 'TCP' },
-                    { id: 'timeout', label: 'Timeout (seconds)', type: 'number', required: true, value: '10' }
+                    { id: 'portNumber', label: 'Port Number', type: 'number', required: true, placeholder: '80' }
                 ]
             },
-            'registry-monitor': {
-                name: 'Registry Monitor',
-                template: 'Monitor.Registry.mpx',
+            'registry-key-monitor': {
+                name: 'Registry Key Exists Monitor',
+                template: 'Monitor.RegistryKey.Exists.mpx',
+                fields: [
+                    { id: 'regKeyPath', label: 'Registry Key Path', type: 'text', required: true, placeholder: 'SOFTWARE\\MyCompany\\MyApplication' }
+                ]
+            },
+            'registry-value-monitor': {
+                name: 'Registry Value Exists Monitor',
+                template: 'Monitor.RegistryValue.Exists.mpx',
                 fields: [
                     { id: 'regKeyPath', label: 'Registry Key Path', type: 'text', required: true, placeholder: 'SOFTWARE\\MyCompany\\MyApplication' },
-                    { id: 'valueName', label: 'Value Name', type: 'text', required: false, placeholder: 'Leave empty to monitor key existence' },
-                    { id: 'expectedValue', label: 'Expected Value', type: 'text', required: false, placeholder: 'Expected registry value' }
+                    { id: 'valueName', label: 'Value Name', type: 'text', required: true, placeholder: 'Version' }
+                ]
+            },
+            'file-age-monitor': {
+                name: 'File Age Monitor',
+                template: 'Monitor.TimedScript.PowerShell.FileAge.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'folderPath', label: 'Folder Path', type: 'text', required: true, placeholder: 'C:\\Logs' },
+                    { id: 'fileExtensionFilter', label: 'File Extension Filter', type: 'text', required: true, placeholder: '*.log,*.txt' },
+                    { id: 'fileAgeThresholdMinutes', label: 'File Age Threshold (minutes)', type: 'number', required: true, value: '60' },
+                    { id: 'fileCountThreshold', label: 'File Count Threshold', type: 'number', required: true, value: '1' }
+                ]
+            },
+            'file-size-monitor': {
+                name: 'File Size Monitor',
+                template: 'Monitor.TimedScript.PowerShell.FileSize.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'folderPath', label: 'Folder Path', type: 'text', required: true, placeholder: 'C:\\Logs' },
+                    { id: 'fileNameFilter', label: 'File Name Filter', type: 'text', required: true, placeholder: '*.log,*.txt' },
+                    { id: 'fileSizeThresholdKB', label: 'File Size Threshold (KB)', type: 'number', required: true, value: '1024' },
+                    { id: 'fileCountThreshold', label: 'File Count Threshold', type: 'number', required: true, value: '1' }
+                ]
+            },
+            'file-count-monitor': {
+                name: 'File Count Monitor',
+                template: 'Monitor.TimedScript.PowerShell.FileCountInFolderThreshold.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'folderPath', label: 'Folder Path', type: 'text', required: true, placeholder: 'C:\\Logs' },
+                    { id: 'fileNameFilter', label: 'File Name Filter', type: 'text', required: true, placeholder: '*.log' },
+                    { id: 'fileCountThreshold', label: 'File Count Threshold', type: 'number', required: true, value: '100' },
+                    { id: 'comparisonType', label: 'Comparison Type', type: 'select', options: ['Greater Than', 'Less Than'], value: 'Greater Than' }
+                ]
+            },
+            'folder-last-write-monitor': {
+                name: 'Folder Last Write Time Monitor',
+                template: 'Monitor.TimedScript.PowerShell.FolderLastWriteTimeOlderThanThreshold.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'folderPath', label: 'Folder Path', type: 'text', required: true, placeholder: 'C:\\Logs' },
+                    { id: 'thresholdMinutes', label: 'Threshold (minutes)', type: 'number', required: true, value: '60' }
+                ]
+            },
+            'unc-path-freespace-monitor': {
+                name: 'UNC Path Free Space Monitor',
+                template: 'Monitor.TimedScript.PowerShell.UNCPathFreeSpace.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'uncPath', label: 'UNC Path', type: 'text', required: true, placeholder: '\\\\server\\share\\folder' },
+                    { id: 'warningThresholdPercent', label: 'Warning Threshold (%)', type: 'number', required: true, value: '20' },
+                    { id: 'criticalThresholdPercent', label: 'Critical Threshold (%)', type: 'number', required: true, value: '10' }
+                ]
+            },
+            'sql-query-monitor': {
+                name: 'SQL Query Monitor',
+                template: 'Monitor.TimedScript.PowerShell.SQLQuery.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'sqlServer', label: 'SQL Server', type: 'text', required: true, placeholder: 'server.domain.com' },
+                    { id: 'sqlDBName', label: 'Database Name', type: 'text', required: true, placeholder: 'MyDatabase' },
+                    { id: 'sqlQuery', label: 'SQL Query', type: 'textarea', required: true, placeholder: 'SELECT COUNT(*) FROM MyTable WHERE Status = "Error"' },
+                    { id: 'rowCountThreshold', label: 'Row Count Threshold', type: 'number', required: true, value: '1' }
+                ]
+            },
+            'text-file-parser-monitor': {
+                name: 'Text File Parser Monitor',
+                template: 'Monitor.TimedScript.PowerShell.ParseTextFile.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'filePath', label: 'File Path', type: 'text', required: true, placeholder: 'C:\\Logs\\application.log' },
+                    { id: 'searchString', label: 'Search String', type: 'text', required: true, placeholder: 'ERROR' },
+                    { id: 'matchThreshold', label: 'Match Threshold', type: 'number', required: true, value: '1' }
+                ]
+            },
+            'powershell-script-monitor': {
+                name: 'PowerShell Script Monitor',
+                template: 'Monitor.TimedScript.PowerShell.NoParams.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'scriptBody', label: 'PowerShell Script', type: 'textarea', required: true, placeholder: 'Enter your PowerShell monitoring script here...' }
+                ]
+            },
+            'powershell-script-with-params-monitor': {
+                name: 'PowerShell Script Monitor (With Parameters)',
+                template: 'Monitor.TimedScript.PowerShell.WithParams.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'scriptBody', label: 'PowerShell Script', type: 'textarea', required: true, placeholder: 'param($Param1, $Param2)\n# Your script here' },
+                    { id: 'param1', label: 'Parameter 1', type: 'text', required: false, placeholder: 'Value for $Param1' },
+                    { id: 'param2', label: 'Parameter 2', type: 'text', required: false, placeholder: 'Value for $Param2' }
+                ]
+            },
+            'vbscript-monitor': {
+                name: 'VBScript Monitor',
+                template: 'Monitor.TimedScript.VBScript.mpx',
+                fields: [
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' },
+                    { id: 'scriptBody', label: 'VBScript', type: 'textarea', required: true, placeholder: 'Enter your VBScript monitoring code here...' }
+                ]
+            },
+            'snmp-monitor': {
+                name: 'SNMP OID Monitor',
+                template: 'Monitor.SNMP.Poll.OIDValue.Integer.Performance.mpx',
+                fields: [
+                    { id: 'oid', label: 'SNMP OID', type: 'text', required: true, placeholder: '1.3.6.1.2.1.1.3.0' },
+                    { id: 'community', label: 'SNMP Community', type: 'text', required: true, value: 'public' },
+                    { id: 'port', label: 'SNMP Port', type: 'number', required: true, value: '161' },
+                    { id: 'threshold', label: 'Threshold', type: 'number', required: true, placeholder: '90' },
+                    { id: 'intervalSeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '300' }
                 ]
             }
         };
@@ -746,7 +910,7 @@ Once you complete Step 1, the preview will show the actual XML structure.`;
         }
         
         // Extract sections from fragments and combine them
-        const { typeDefinitions, monitoring, presentation } = this.extractAndCombineSections(allFragments);
+        const { typeDefinitions, monitoring, presentation, languagePacks } = this.extractAndCombineSections(allFragments);
         
         // Build references
         let references = this.generateReferences();
@@ -769,6 +933,7 @@ ${references}
 ${monitoring}
   </Monitoring>
   ${presentation ? `<Presentation>\n${presentation}\n  </Presentation>` : ''}
+${languagePacks ? `${languagePacks}` : ''}
 </ManagementPack>`;
     }
 
@@ -853,17 +1018,40 @@ ${rules.map(rule => '      ' + rule).join('\n')}
         
         combinedMonitoring = monitoringSections.join('\n');
         
+        // Generate StringResource elements for monitors with AlertMessage references
+        let stringResources = [];
+        monitors.forEach(monitorXml => {
+            // Look for AlertMessage references in the monitor XML
+            const alertMessageMatch = monitorXml.match(/AlertMessage="([^"]+)"/);
+            if (alertMessageMatch) {
+                const alertMessageId = alertMessageMatch[1];
+                stringResources.push(`      <StringResource ID="${alertMessageId}" />`);
+            }
+        });
+        
         let combinedPresentation = '';
-        if (displayStrings.length > 0) {
+        if (displayStrings.length > 0 || stringResources.length > 0) {
             combinedPresentation = `    <StringResources>
-${displayStrings.map(str => '      ' + str).join('\n')}
+${stringResources.join('\n')}
     </StringResources>`;
+        }
+        
+        let combinedLanguagePacks = '';
+        if (displayStrings.length > 0) {
+            combinedLanguagePacks = `  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+${displayStrings.map(str => '        ' + str).join('\n')}
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>`;
         }
         
         return {
             typeDefinitions: combinedTypeDefinitions,
             monitoring: combinedMonitoring,
-            presentation: combinedPresentation
+            presentation: combinedPresentation,
+            languagePacks: combinedLanguagePacks
         };
     }
 
@@ -876,24 +1064,20 @@ ${displayStrings.map(str => '      ' + str).join('\n')}
         let refs = [
             `      <Reference Alias="System">
         <ID>System.Library</ID>
-        <Version>7.0.8560.0</Version>
+        <Version>7.5.8501.0</Version>
         <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
       </Reference>`,
             `      <Reference Alias="Windows">
         <ID>Microsoft.Windows.Library</ID>
-        <Version>7.0.8560.0</Version>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>`,
+            `      <Reference Alias="Health">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8437.0</Version>
         <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
       </Reference>`
         ];
-
-        // Add Health library if we have monitors
-        if (this.mpData.selectedComponents.monitors && this.mpData.selectedComponents.monitors.length > 0) {
-            refs.push(`      <Reference Alias="Health">
-        <ID>System.Health.Library</ID>
-        <Version>7.0.8560.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>`);
-        }
 
         return refs.join('\n');
     }
@@ -959,6 +1143,7 @@ ${displayStrings.map(str => '      ' + str).join('\n')}
             '##CompanyID##': companyId,
             '##AppName##': appName,
             '##UniqueID##': config.uniqueId || 'Application',
+            '##ClassID##': config.targetClass || config.targetclass || 'Windows!Microsoft.Windows.Server.OperatingSystem',
             '##RegKeyPath##': config.regKeyPath || config.regkeypath || 'SOFTWARE\\MyCompany\\MyApplication',
             '##TargetClass##': config.targetClass || config.targetclass || 'Windows!Microsoft.Windows.Server.OperatingSystem',
             '##ServiceName##': config.serviceName || config.servicename || 'YourService',
@@ -970,19 +1155,52 @@ ${displayStrings.map(str => '      ' + str).join('\n')}
             '##ExpectedValue##': config.expectedValue || config.expectedvalue || '',
             '##AlertPriority##': config.alertPriority || config.alertpriority || 'Normal',
             '##AlertSeverity##': config.alertSeverity || config.alertseverity || 'Error',
-            '##CounterObject##': config.counterObject || config.counterobject || 'Processor',
+            '##ObjectName##': config.objectName || config.counterObject || config.counterobject || 'Processor',
             '##CounterName##': config.counterName || config.countername || '% Processor Time',
-            '##Instance##': config.instance || '_Total',
+            '##CounterObject##': config.counterObject || config.counterobject || 'Processor',
+            '##InstanceName##': config.instanceName || config.instance || '_Total',
+            '##Instance##': config.instanceName || config.instance || '_Total',
+            '##FrequencySeconds##': config.frequencySeconds || config.intervalseconds || config.intervalSeconds || '300',
+            '##IntervalSeconds##': config.intervalSeconds || config.frequencySeconds || config.intervalseconds || '300',
+            '##Threshold##': config.threshold || config.warningThreshold || config.warningthreshold || '80',
             '##WarningThreshold##': config.warningThreshold || config.warningthreshold || '80',
             '##CriticalThreshold##': config.criticalThreshold || config.criticalthreshold || '95',
+            '##Samples##': config.samples || '3',
+            '##ProcessName##': config.processName || config.processname || 'notepad.exe',
+            '##MinProcessCount##': config.minProcessCount || config.minprocesscount || '1',
+            '##MaxProcessCount##': config.maxProcessCount || config.maxprocesscount || '10',
+            '##MatchCount##': config.matchCount || config.matchcount || '2',
+            '##PortNumber##': config.portNumber || config.portnumber || '80',
+            '##Protocol##': config.protocol || 'TCP',
+            '##Timeout##': config.timeout || '10',
+            '##FolderPath##': config.folderPath || config.folderpath || 'C:\\Logs',
+            '##FileExtensionFilter##': config.fileExtensionFilter || config.fileextensionfilter || '*.log',
+            '##FileNameFilter##': config.fileNameFilter || config.filenamefilter || '*.log',
+            '##FileAgeThresholdMinutes##': config.fileAgeThresholdMinutes || config.fileagethresholdminutes || '60',
+            '##FileSizeThresholdKB##': config.fileSizeThresholdKB || config.filesizethresholdkb || '1024',
+            '##FileCountThreshold##': config.fileCountThreshold || config.filecountthreshold || '1',
+            '##UNCPath##': config.uncPath || config.uncpath || '\\\\server\\share',
+            '##WarningThresholdPercent##': config.warningThresholdPercent || config.warningthresholdpercent || '20',
+            '##CriticalThresholdPercent##': config.criticalThresholdPercent || config.criticalthresholdpercent || '10',
+            '##SQLServer##': config.sqlServer || config.sqlserver || 'localhost',
+            '##SQLDBName##': config.sqlDBName || config.sqldbname || 'master',
+            '##SQLQuery##': config.sqlQuery || config.sqlquery || 'SELECT 1',
+            '##RowCountThreshold##': config.rowCountThreshold || config.rowcountthreshold || '1',
+            '##FilePath##': config.filePath || config.filepath || 'C:\\Logs\\app.log',
+            '##SearchString##': config.searchString || config.searchstring || 'ERROR',
+            '##MatchThreshold##': config.matchThreshold || config.matchthreshold || '1',
+            '##Param1##': config.param1 || '',
+            '##Param2##': config.param2 || '',
+            '##ThresholdMinutes##': config.thresholdMinutes || config.thresholdminutes || '60',
+            '##ComparisonType##': config.comparisonType || config.comparisontype || 'Greater Than',
+            '##OID##': config.oid || '1.3.6.1.2.1.1.3.0',
+            '##Community##': config.community || 'public',
+            '##Port##': config.port || '161',
+            '##ShellCommand##': config.shellCommand || config.shellcommand || 'echo "test"',
             '##LogName##': config.logName || config.logname || 'Application',
             '##EventSource##': config.eventSource || config.eventsource || '',
             '##EventId##': config.eventId || config.eventid || '',
-            '##EventLevel##': config.eventLevel || config.eventlevel || 'Error',
-            '##IntervalSeconds##': config.intervalSeconds || config.intervalseconds || '300',
-            '##PortNumber##': config.portNumber || config.portnumber || '80',
-            '##Protocol##': config.protocol || 'TCP',
-            '##Timeout##': config.timeout || '10'
+            '##EventLevel##': config.eventLevel || config.eventlevel || 'Error'
         };
 
         // Debug logging to help identify the issue

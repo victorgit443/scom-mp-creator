@@ -177,12 +177,13 @@
                     <p class="step-description">Choose the health monitors you want to create. Monitors track the state of your discovered objects and generate alerts when issues occur.</p>
                     
                     <div class="components-grid">
+                        <!-- Most Common Monitors - Service & Process -->
                         <div class="component-card" data-component="service-monitor">
                             <div class="component-icon">
                                 <i class="fas fa-cogs"></i>
                             </div>
                             <h3>Service Monitor</h3>
-                            <p>Monitor Windows service state (Running/Stopped)</p>
+                            <p>Monitor Windows service state with alerts</p>
                             <label class="component-checkbox">
                                 <input type="checkbox" value="service-monitor">
                                 <span class="checkmark"></span>
@@ -190,12 +191,52 @@
                             </label>
                         </div>
 
+                        <div class="component-card" data-component="process-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <h3>Process Monitor</h3>
+                            <p>Monitor process count with min/max thresholds</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="process-monitor">
+                                <span class="checkmark"></span>
+                                Add Process Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="service-monitor-no-alert">
+                            <div class="component-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h3>Service Monitor (No Alert)</h3>
+                            <p>Monitor Windows service state without generating alerts</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="service-monitor-no-alert">
+                                <span class="checkmark"></span>
+                                Add Silent Service Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="process-performance-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                            <h3>Process Performance Monitor</h3>
+                            <p>Monitor specific process performance metrics</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="process-performance-monitor">
+                                <span class="checkmark"></span>
+                                Add Process Performance Monitor
+                            </label>
+                        </div>
+
+                        <!-- Performance Monitors -->
                         <div class="component-card" data-component="performance-monitor">
                             <div class="component-icon">
                                 <i class="fas fa-tachometer-alt"></i>
                             </div>
                             <h3>Performance Monitor</h3>
-                            <p>Monitor performance counters and generate alerts based on thresholds</p>
+                            <p>Monitor performance counters with consecutive sample thresholds</p>
                             <label class="component-checkbox">
                                 <input type="checkbox" value="performance-monitor">
                                 <span class="checkmark"></span>
@@ -203,38 +244,26 @@
                             </label>
                         </div>
 
-                        <div class="component-card" data-component="event-log-monitor">
+                        <div class="component-card" data-component="performance-monitor-multi-instance">
                             <div class="component-icon">
-                                <i class="fas fa-list-alt"></i>
+                                <i class="fas fa-chart-bar"></i>
                             </div>
-                            <h3>Event Log Monitor</h3>
-                            <p>Monitor for specific events in Windows Event Logs</p>
+                            <h3>Performance Monitor (Multi-Instance)</h3>
+                            <p>Monitor performance counters across multiple instances</p>
                             <label class="component-checkbox">
-                                <input type="checkbox" value="event-log-monitor">
+                                <input type="checkbox" value="performance-monitor-multi-instance">
                                 <span class="checkmark"></span>
-                                Add Event Log Monitor
+                                Add Multi-Instance Monitor
                             </label>
                         </div>
 
-                        <div class="component-card" data-component="script-monitor">
-                            <div class="component-icon">
-                                <i class="fas fa-code"></i>
-                            </div>
-                            <h3>Script Monitor</h3>
-                            <p>Custom PowerShell script to check application health</p>
-                            <label class="component-checkbox">
-                                <input type="checkbox" value="script-monitor">
-                                <span class="checkmark"></span>
-                                Add Script Monitor
-                            </label>
-                        </div>
-
+                        <!-- Network Monitors -->
                         <div class="component-card" data-component="port-monitor">
                             <div class="component-icon">
                                 <i class="fas fa-network-wired"></i>
                             </div>
                             <h3>Port Check Monitor</h3>
-                            <p>Monitor TCP port availability</p>
+                            <p>Monitor TCP port availability and listening status</p>
                             <label class="component-checkbox">
                                 <input type="checkbox" value="port-monitor">
                                 <span class="checkmark"></span>
@@ -242,16 +271,177 @@
                             </label>
                         </div>
 
-                        <div class="component-card" data-component="registry-monitor">
+                        <!-- Registry Monitors -->
+                        <div class="component-card" data-component="registry-key-monitor">
                             <div class="component-icon">
                                 <i class="fas fa-key"></i>
                             </div>
-                            <h3>Registry Monitor</h3>
-                            <p>Monitor registry key or value changes</p>
+                            <h3>Registry Key Monitor</h3>
+                            <p>Monitor if registry keys exist</p>
                             <label class="component-checkbox">
-                                <input type="checkbox" value="registry-monitor">
+                                <input type="checkbox" value="registry-key-monitor">
                                 <span class="checkmark"></span>
-                                Add Registry Monitor
+                                Add Registry Key Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="registry-value-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3>Registry Value Monitor</h3>
+                            <p>Monitor if registry values exist</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="registry-value-monitor">
+                                <span class="checkmark"></span>
+                                Add Registry Value Monitor
+                            </label>
+                        </div>
+
+                        <!-- File System Monitors -->
+                        <div class="component-card" data-component="file-age-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h3>File Age Monitor</h3>
+                            <p>Monitor files older than a specified threshold</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="file-age-monitor">
+                                <span class="checkmark"></span>
+                                Add File Age Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="file-size-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-weight-hanging"></i>
+                            </div>
+                            <h3>File Size Monitor</h3>
+                            <p>Monitor files smaller than expected size threshold</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="file-size-monitor">
+                                <span class="checkmark"></span>
+                                Add File Size Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="file-count-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-list-ol"></i>
+                            </div>
+                            <h3>File Count Monitor</h3>
+                            <p>Monitor number of files in a folder</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="file-count-monitor">
+                                <span class="checkmark"></span>
+                                Add File Count Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="folder-last-write-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <h3>Folder Last Write Monitor</h3>
+                            <p>Monitor when folders were last modified</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="folder-last-write-monitor">
+                                <span class="checkmark"></span>
+                                Add Folder Write Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="text-file-parser-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>Text File Parser Monitor</h3>
+                            <p>Search for strings in text files</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="text-file-parser-monitor">
+                                <span class="checkmark"></span>
+                                Add Text Parser Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="unc-path-freespace-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                            <h3>UNC Path Free Space Monitor</h3>
+                            <p>Monitor free space on network shares</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="unc-path-freespace-monitor">
+                                <span class="checkmark"></span>
+                                Add UNC Space Monitor
+                            </label>
+                        </div>
+
+                        <!-- Database Monitors -->
+                        <div class="component-card" data-component="sql-query-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3>SQL Query Monitor</h3>
+                            <p>Execute SQL queries and monitor results</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="sql-query-monitor">
+                                <span class="checkmark"></span>
+                                Add SQL Query Monitor
+                            </label>
+                        </div>
+
+                        <!-- Script Monitors -->
+                        <div class="component-card" data-component="powershell-script-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h3>PowerShell Script Monitor</h3>
+                            <p>Custom PowerShell script monitoring</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="powershell-script-monitor">
+                                <span class="checkmark"></span>
+                                Add PowerShell Monitor
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="powershell-script-with-params-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-terminal"></i>
+                            </div>
+                            <h3>PowerShell Script (With Params)</h3>
+                            <p>PowerShell script monitoring with parameters</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="powershell-script-with-params-monitor">
+                                <span class="checkmark"></span>
+                                Add Parameterized PowerShell
+                            </label>
+                        </div>
+
+                        <div class="component-card" data-component="vbscript-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-file-code"></i>
+                            </div>
+                            <h3>VBScript Monitor</h3>
+                            <p>Custom VBScript monitoring</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="vbscript-monitor">
+                                <span class="checkmark"></span>
+                                Add VBScript Monitor
+                            </label>
+                        </div>
+
+                        <!-- Network Management -->
+                        <div class="component-card" data-component="snmp-monitor">
+                            <div class="component-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <h3>SNMP OID Monitor</h3>
+                            <p>Monitor SNMP OID values</p>
+                            <label class="component-checkbox">
+                                <input type="checkbox" value="snmp-monitor">
+                                <span class="checkmark"></span>
+                                Add SNMP Monitor
                             </label>
                         </div>
                     </div>
