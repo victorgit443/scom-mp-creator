@@ -219,7 +219,7 @@ class MPCreator {
             <xsd:element name="ProcessName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
             <xsd:element name="FrequencySeconds" type="xsd:unsignedInt" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
             <xsd:element name="MinProcessCount" type="xsd:unsignedInt" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
-            <xsd:element name="MaxProcessCount" type="xsd:unsignedInt" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />			
+            <xsd:element name="MaxProcessCount" type="xsd:unsignedInt" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
             <xsd:element name="MatchCount" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
           </Configuration>
           <OverrideableParameters>
@@ -234,81 +234,81 @@ class MPCreator {
                 <Frequency>$Config/FrequencySeconds$</Frequency>
               </DataSource>
               <ConditionDetection ID="CDProcessCountWithinThresholds" TypeID="System!System.ExpressionFilter">
-                  <Expression>
-                    <And>
-                      <Expression>
-                        <Exists>
-                          <ValueExpression>
-                            <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
-                          </ValueExpression>
-                        </Exists>
-                      </Expression>
-                      <Expression>						
-                        <SimpleExpression>
-                          <ValueExpression>
-                            <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
-                          </ValueExpression>
-                          <Operator>GreaterEqual</Operator>
-                          <ValueExpression>
-                            <Value Type="UnsignedInteger">$Config/MinProcessCount$</Value>
-                          </ValueExpression>
-                        </SimpleExpression>
-                      </Expression>	
-                      <Expression>							  
-                        <SimpleExpression>
-                          <ValueExpression>
-                            <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
-                          </ValueExpression>
-                          <Operator>LessEqual</Operator>
-                          <ValueExpression>
-                            <Value Type="UnsignedInteger">$Config/MaxProcessCount$</Value>
-                          </ValueExpression>
-                        </SimpleExpression>
-                      </Expression>							
-                    </And>
-                  </Expression>
+                <Expression>
+                  <And>
+                    <Expression>
+                      <Exists>
+                        <ValueExpression>
+                          <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                        </ValueExpression>
+                      </Exists>
+                    </Expression>
+                    <Expression>
+                      <SimpleExpression>
+                        <ValueExpression>
+                          <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                        </ValueExpression>
+                        <Operator>GreaterEqual</Operator>
+                        <ValueExpression>
+                          <Value Type="UnsignedInteger">$Config/MinProcessCount$</Value>
+                        </ValueExpression>
+                      </SimpleExpression>
+                    </Expression>
+                    <Expression>  
+                      <SimpleExpression>
+                        <ValueExpression>
+                          <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                        </ValueExpression>
+                        <Operator>LessEqual</Operator>
+                        <ValueExpression>
+                          <Value Type="UnsignedInteger">$Config/MaxProcessCount$</Value>
+                        </ValueExpression>
+                      </SimpleExpression>
+                    </Expression>
+                  </And>
+                </Expression>
               </ConditionDetection>
               <ConditionDetection ID="CDProcessCountThresholdBreached" TypeID="System!System.ExpressionFilter">
-                  <Expression>
-                    <Not>
-                      <Expression>
-                        <And>
-                          <Expression>
-                            <Exists>
-                              <ValueExpression>
-                                <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
-                              </ValueExpression>
-                            </Exists>
-                          </Expression>
-                          <Expression>						
-                            <SimpleExpression>
-                              <ValueExpression>
-                                <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
-                              </ValueExpression>
-                              <Operator>GreaterEqual</Operator>
-                              <ValueExpression>
-                                <Value Type="UnsignedInteger">$Config/MinProcessCount$</Value>
-                              </ValueExpression>
-                            </SimpleExpression>
-                          </Expression>	
-                          <Expression>							  
-                            <SimpleExpression>
-                              <ValueExpression>
-                                <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
-                              </ValueExpression>
-                              <Operator>LessEqual</Operator>
-                              <ValueExpression>
-                                <Value Type="UnsignedInteger">$Config/MaxProcessCount$</Value>
-                              </ValueExpression>
-                            </SimpleExpression>
-                          </Expression>							
-                        </And>
-                      </Expression>
-                    </Not>
-                  </Expression>
-                  <SuppressionSettings>
-                    <MatchCount>$Config/MatchCount$</MatchCount>
-                  </SuppressionSettings>			  
+                <Expression>
+                  <Not>
+                    <Expression>
+                      <And>
+                        <Expression>
+                          <Exists>
+                            <ValueExpression>
+                              <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                            </ValueExpression>
+                          </Exists>
+                        </Expression>
+                        <Expression>
+                          <SimpleExpression>
+                            <ValueExpression>
+                              <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                            </ValueExpression>
+                            <Operator>GreaterEqual</Operator>
+                            <ValueExpression>
+                              <Value Type="UnsignedInteger">$Config/MinProcessCount$</Value>
+                            </ValueExpression>
+                          </SimpleExpression>
+                        </Expression>
+                        <Expression>  
+                          <SimpleExpression>
+                            <ValueExpression>
+                              <XPathQuery Type="UnsignedInteger">ProcessInformations/ProcessInformation[./ProcessName ='$Config/ProcessName$']/ActiveInstanceCount</XPathQuery>
+                            </ValueExpression>
+                            <Operator>LessEqual</Operator>
+                            <ValueExpression>
+                              <Value Type="UnsignedInteger">$Config/MaxProcessCount$</Value>
+                            </ValueExpression>
+                          </SimpleExpression>
+                        </Expression>
+                      </And>
+                    </Expression>
+                  </Not>
+                </Expression>
+                <SuppressionSettings>
+                  <MatchCount>$Config/MatchCount$</MatchCount>
+                </SuppressionSettings>  
               </ConditionDetection>
             </MemberModules>
             <RegularDetections>
@@ -324,7 +324,7 @@ class MPCreator {
               </RegularDetection>
             </RegularDetections>
           </MonitorImplementation>
-        </UnitMonitorType>		
+        </UnitMonitorType>
     </MonitorTypes>
   </TypeDefinitions>
   <Monitoring>
@@ -337,7 +337,7 @@ class MPCreator {
           <AlertPriority>Normal</AlertPriority>
           <AlertSeverity>Warning</AlertSeverity>
           <AlertParameters>
-            <AlertParameter1>$Data[Default='0']/Context/ProcessInformations/ProcessInformation[./ProcessName ='##ProcessName##']/ActiveInstanceCount$</AlertParameter1>			
+            <AlertParameter1>$Data[Default='0']/Context/ProcessInformations/ProcessInformation[./ProcessName ='##ProcessName##']/ActiveInstanceCount$</AlertParameter1>
             <AlertParameter2>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter2>
           </AlertParameters>
         </AlertSettings>
@@ -349,7 +349,7 @@ class MPCreator {
           <ProcessName>##ProcessName##</ProcessName>    
           <FrequencySeconds>##FrequencySeconds##</FrequencySeconds>
           <MinProcessCount>##MinProcessCount##</MinProcessCount>
-          <MaxProcessCount>##MaxProcessCount##</MaxProcessCount>		  
+          <MaxProcessCount>##MaxProcessCount##</MaxProcessCount>  
           <MatchCount>##MatchCount##</MatchCount>
         </Configuration>
       </UnitMonitor>
@@ -385,10 +385,7 @@ Computer: {1}</Description>
 </ManagementPackFragment>`,
                 fields: [
                     { id: 'uniqueId', label: 'Unique ID (no spaces)', type: 'text', required: true, placeholder: 'WebServer' },
-                    { id: 'targetClass', label: 'Target Class', type: 'select', required: true, value: 'Windows!Microsoft.Windows.Server.OperatingSystem', options: [
-                        { value: 'Windows!Microsoft.Windows.Server.OperatingSystem', text: 'Windows Server OS' },
-                        { value: 'Windows!Microsoft.Windows.Computer', text: 'Windows Computer' }
-                    ]},
+                    { id: 'targetClass', label: 'Target Class', type: 'select', required: true, value: 'Windows!Microsoft.Windows.Server.OperatingSystem', options: ['Windows!Microsoft.Windows.Server.OperatingSystem', 'Windows!Microsoft.Windows.Computer'] },
                     { id: 'processName', label: 'Process Name (lowercase)', type: 'text', required: true, placeholder: 'notepad.exe' },
                     { id: 'frequencySeconds', label: 'Check Interval (seconds)', type: 'number', required: true, value: '60' },
                     { id: 'minProcessCount', label: 'Minimum Process Count', type: 'number', required: true, value: '1' },
