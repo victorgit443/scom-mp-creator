@@ -78,30 +78,6 @@ class MPCreator {
         </DataSource>
       </Discovery>
     </Discoveries>
-    <Monitors>
-      <UnitMonitor ID="##CompanyID##.##AppName##.##UniqueID##.AvailabilityMonitor" Accessibility="Public" Enabled="true" Target="##CompanyID##.##AppName##.##UniqueID##.Class" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.CheckNTServiceStateMonitorType" ConfirmDelivery="false">
-        <Category>AvailabilityHealth</Category>
-        <AlertSettings AlertMessage="##CompanyID##.##AppName##.##UniqueID##.AvailabilityMonitor.AlertMessage">
-          <AlertOnState>Warning</AlertOnState>
-          <AutoResolve>true</AutoResolve>
-          <AlertPriority>Normal</AlertPriority>
-          <AlertSeverity>Error</AlertSeverity>
-          <AlertParameters>
-            <AlertParameter1>$Data/Context/Property[@Name='Name']$</AlertParameter1>
-            <AlertParameter2>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter2>
-          </AlertParameters>
-        </AlertSettings>
-        <OperationalStates>
-          <OperationalState ID="Running" MonitorTypeStateID="Running" HealthState="Success" />
-          <OperationalState ID="NotRunning" MonitorTypeStateID="NotRunning" HealthState="Warning" />
-        </OperationalStates>
-        <Configuration>
-          <ComputerName />
-          <ServiceName>W3SVC</ServiceName>
-          <CheckStartupType />
-        </Configuration>
-      </UnitMonitor>
-    </Monitors>
   </Monitoring>
   <LanguagePacks>
     <LanguagePack ID="ENU" IsDefault="true">
@@ -111,9 +87,6 @@ class MPCreator {
         </DisplayString>
         <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.Class.Discovery">
           <Name>##CompanyID## ##AppName## ##UniqueID## Class Discovery</Name>
-        </DisplayString>
-        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.AvailabilityMonitor">
-          <Name>##CompanyID## ##AppName## ##UniqueID## Availability Monitor</Name>
         </DisplayString>
       </DisplayStrings>
       <KnowledgeArticles></KnowledgeArticles>
