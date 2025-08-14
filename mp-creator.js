@@ -101,11 +101,72 @@ class MPCreator {
             },
             'registry-value': {
                 name: 'Registry Value Discovery',
-                template: 'Class.And.Discovery.Registry.Value.mpx',
+                template: `<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="##CompanyID##.##AppName##.##UniqueID##.Class" Base="Windows!Microsoft.Windows.LocalApplication" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false"></ClassType>
+      </ClassTypes>
+    </EntityTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="##CompanyID##.##AppName##.##UniqueID##.Class.Discovery" Target="##TargetClass##" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="##CompanyID##.##AppName##.##UniqueID##.Class" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.FilteredRegistryDiscoveryProvider">
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</ComputerName>
+          <RegistryAttributeDefinitions>
+            <RegistryAttributeDefinition>
+              <AttributeName>##UniqueID##RegValueData</AttributeName>
+              <Path>##RegKeyPath##\\##ValueName##</Path>
+              <PathType>1</PathType>
+              <AttributeType>##AttributeType##</AttributeType>
+            </RegistryAttributeDefinition>
+          </RegistryAttributeDefinitions>
+          <Frequency>86400</Frequency>
+          <ClassId>$MPElement[Name="##CompanyID##.##AppName##.##UniqueID##.Class"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Name>
+                <Value>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name="System!System.Entity"]/DisplayName$</Name>
+                <Value>##CompanyID## ##AppName##</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+          ##ExpressionBlock##
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.Class">
+          <Name>##CompanyID## ##AppName## ##UniqueID## Class</Name>
+        </DisplayString>
+        <DisplayString ElementID="##CompanyID##.##AppName##.##UniqueID##.Class.Discovery">
+          <Name>##CompanyID## ##AppName## ##UniqueID## Class Discovery</Name>
+        </DisplayString>
+      </DisplayStrings>
+      <KnowledgeArticles></KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>`,
                 fields: [
                     { id: 'regKeyPath', label: 'Registry Key Path', type: 'text', required: true, placeholder: 'SOFTWARE\\MyCompany\\MyApplication' },
                     { id: 'valueName', label: 'Value Name', type: 'text', required: true, placeholder: 'Version' },
-                    { id: 'expectedValue', label: 'Expected Value', type: 'text', required: false, placeholder: 'Leave empty to check if value exists' },
+                    { id: 'discoveryMode', label: 'Discovery Mode', type: 'select', required: true, options: ['Existence', 'String Match', 'Integer Match', 'Regex Pattern'], value: 'Existence' },
+                    { id: 'expectedValue', label: 'Expected Value', type: 'text', required: false, placeholder: 'Enter expected value (for String/Integer Match)' },
+                    { id: 'regexPattern', label: 'Regex Pattern', type: 'text', required: false, placeholder: 'Enter regex pattern (for Regex Pattern mode)' },
+                    { id: 'operator', label: 'Comparison Operator', type: 'select', required: false, options: ['Equal', 'NotEqual', 'Greater', 'Less', 'GreaterEqual', 'LessEqual', 'Like', 'NotLike'], value: 'Equal' },
+                    { id: 'uniqueId', label: 'Unique ID', type: 'text', required: true, placeholder: 'Application' },
                     { id: 'targetClass', label: 'Target Class', type: 'select', options: ['Windows!Microsoft.Windows.Server.OperatingSystem', 'Windows!Microsoft.Windows.Computer'], value: 'Windows!Microsoft.Windows.Server.OperatingSystem' }
                 ]
             },
@@ -524,6 +585,11 @@ Computer: {1}</Description>
                 this.handleComponentSelection(e.target);
             }
             
+            // Handle discovery mode changes for registry value discovery
+            if (e.target.id && e.target.id.includes('registry-value-discoveryMode')) {
+                this.handleRegistryValueModeChange(e.target);
+            }
+            
             // Auto-save configuration data when any input in config section changes
             if (e.target.closest('#component-configs')) {
                 this.saveConfigurationData();
@@ -547,6 +613,68 @@ Computer: {1}</Description>
                 }
             }
         }, true);
+    }
+
+    handleRegistryValueModeChange(selectElement) {
+        const selectedMode = selectElement.value;
+        const configPanel = selectElement.closest('.config-panel');
+        
+        // Find all the conditional fields
+        const expectedValueField = configPanel.querySelector('[id*="expectedValue"]');
+        const regexPatternField = configPanel.querySelector('[id*="regexPattern"]');
+        const operatorField = configPanel.querySelector('[id*="operator"]');
+        
+        // Hide all conditional fields first
+        if (expectedValueField) {
+            const expectedValueGroup = expectedValueField.closest('.form-group');
+            expectedValueGroup.style.display = 'none';
+            expectedValueField.removeAttribute('required');
+        }
+        
+        if (regexPatternField) {
+            const regexPatternGroup = regexPatternField.closest('.form-group');
+            regexPatternGroup.style.display = 'none';
+            regexPatternField.removeAttribute('required');
+        }
+        
+        if (operatorField) {
+            const operatorGroup = operatorField.closest('.form-group');
+            operatorGroup.style.display = 'none';
+        }
+        
+        // Show relevant fields based on selected mode
+        switch (selectedMode) {
+            case 'String Match':
+            case 'Integer Match':
+                if (expectedValueField) {
+                    const expectedValueGroup = expectedValueField.closest('.form-group');
+                    expectedValueGroup.style.display = 'block';
+                    expectedValueField.setAttribute('required', 'required');
+                    
+                    // Update placeholder based on mode
+                    expectedValueField.placeholder = selectedMode === 'String Match' 
+                        ? 'Enter expected string value' 
+                        : 'Enter expected integer value';
+                }
+                if (operatorField) {
+                    const operatorGroup = operatorField.closest('.form-group');
+                    operatorGroup.style.display = 'block';
+                }
+                break;
+                
+            case 'Regex Pattern':
+                if (regexPatternField) {
+                    const regexPatternGroup = regexPatternField.closest('.form-group');
+                    regexPatternGroup.style.display = 'block';
+                    regexPatternField.setAttribute('required', 'required');
+                }
+                break;
+                
+            case 'Existence':
+            default:
+                // No additional fields needed for existence check
+                break;
+        }
     }
 
     selectDiscoveryCard(card) {
@@ -859,6 +987,21 @@ Computer: {1}</Description>
             const value = field.value || '';
             const placeholder = field.placeholder || '';
             
+            // Determine if this field should be initially hidden for registry value discovery
+            let isHidden = false;
+            if (componentType === 'registry-value') {
+                const defaultMode = 'Existence'; // Default discovery mode
+                if (field.id === 'expectedValue' && (defaultMode === 'Existence' || defaultMode === 'Regex Pattern')) {
+                    isHidden = true;
+                }
+                if (field.id === 'regexPattern' && defaultMode !== 'Regex Pattern') {
+                    isHidden = true;
+                }
+                if (field.id === 'operator' && defaultMode === 'Existence') {
+                    isHidden = true;
+                }
+            }
+            
             let input;
             switch (field.type) {
                 case 'select':
@@ -880,9 +1023,17 @@ Computer: {1}</Description>
                     input = `<input type="text" id="${fieldId}" placeholder="${placeholder}" value="${value}" ${required}>`;
             }
             
+            const displayStyle = isHidden ? 'style="display: none;"' : '';
+            const actualRequired = isHidden ? '' : required; // Remove required if hidden
+            
+            // Update the input to remove required if hidden
+            if (isHidden) {
+                input = input.replace(/required/g, '');
+            }
+            
             return `
-                <div class="form-group">
-                    <label for="${fieldId}">${field.label}${field.required ? ' *' : ''}</label>
+                <div class="form-group" ${displayStyle}>
+                    <label for="${fieldId}">${field.label}${(field.required && !isHidden) ? ' *' : ''}</label>
                     ${input}
                 </div>
             `;
@@ -1291,14 +1442,88 @@ ${displayStrings.map(str => '        ' + str).join('\n')}
         
         const config = this.mpData.configurations[componentType] || {};
         
+        // Special handling for registry value discovery
+        let attributeType = '0'; // Default: Boolean (existence check)
+        let expressionBlock = '';
+        
+        if (componentType === 'registry-value') {
+            const discoveryMode = config.discoveryMode || 'Existence';
+            const expectedValue = config.expectedValue || '';
+            const regexPattern = config.regexPattern || '';
+            const operator = config.operator || 'Equal';
+            
+            switch (discoveryMode) {
+                case 'Existence':
+                    attributeType = '0'; // Boolean
+                    expressionBlock = `<Expression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="Boolean">Values/UNIQUEID_PLACEHOLDERRegValueData</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="Boolean">true</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </Expression>`;
+                    break;
+                    
+                case 'String Match':
+                    attributeType = '1'; // String
+                    expressionBlock = `<Expression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Values/UNIQUEID_PLACEHOLDERRegValueData</XPathQuery>
+              </ValueExpression>
+              <Operator>${operator}</Operator>
+              <ValueExpression>
+                <Value Type="String">${expectedValue}</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </Expression>`;
+                    break;
+                    
+                case 'Integer Match':
+                    attributeType = '2'; // Integer
+                    expressionBlock = `<Expression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="Integer">Values/UNIQUEID_PLACEHOLDERRegValueData</XPathQuery>
+              </ValueExpression>
+              <Operator>${operator}</Operator>
+              <ValueExpression>
+                <Value Type="Integer">${expectedValue}</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </Expression>`;
+                    break;
+                    
+                case 'Regex Pattern':
+                    attributeType = '1'; // String
+                    expressionBlock = `<Expression>
+            <RegExExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Values/UNIQUEID_PLACEHOLDERRegValueData</XPathQuery>
+              </ValueExpression>
+              <Operator>MatchesRegularExpression</Operator>
+              <Pattern>${regexPattern}</Pattern>
+            </RegExExpression>
+          </Expression>`;
+                    break;
+            }
+        }
+        
         // Create replacement map with better debugging
         const replacements = {
             '##CompanyID##': companyId,
             '##AppName##': appName,
             '##UniqueID##': config.uniqueId || 'Application',
+            'UNIQUEID_PLACEHOLDER': config.uniqueId || 'Application',
             '##ClassID##': config.targetClass || config.targetclass || 'Windows!Microsoft.Windows.Server.OperatingSystem',
             '##RegKeyPath##': config.regKeyPath || config.regkeypath || 'SOFTWARE\\MyCompany\\MyApplication',
             '##TargetClass##': config.targetClass || config.targetclass || 'Windows!Microsoft.Windows.Server.OperatingSystem',
+            '##AttributeType##': attributeType,
+            '##ExpressionBlock##': expressionBlock,
             '##ServiceName##': config.serviceName || config.servicename || 'YourService',
             '##WMIQuery##': config.wmiQuery || config.wmiquery || 'SELECT * FROM Win32_Service WHERE Name = "YourService"',
             '##Namespace##': config.namespace || 'root\\cimv2',
